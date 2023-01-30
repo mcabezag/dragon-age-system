@@ -145,7 +145,7 @@ export class AdvancedSettings extends FormApplication {
       s.filePickerType = s.filePicker === true ? "any" : s.filePicker;
 
       // Classify setting
-      const name = s.namespace;
+      const name = "dragon-" + s.namespace;
       if ( name === game.system.id ) data.settings[s.key] = s;
     }
 
