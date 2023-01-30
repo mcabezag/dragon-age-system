@@ -1,7 +1,8 @@
 <form class="game-settings-window feature-controls">
     <h1>{{localize "SETTINGS.advSettings"}}</h1>
-    {{console.log("*****", advSettings)}}
+    {{log advSettings}}
     {{#each advSettings as |setting|}}
+    {{debugger}}
     {{#with (lookup ../settings [setting])~}}
     <div class="form-group">
         <label>{{name}}</label>
