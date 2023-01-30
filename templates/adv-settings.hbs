@@ -1,10 +1,10 @@
 <form class="game-settings-window feature-controls">
     <h1>{{localize "SETTINGS.advSettings"}}</h1>
-    {{#each advSettings as |setting|}}
     {{log advSettings}}
-    {{log ../settings}}
-    {{#with (lookup ../settings [setting])~}}
+    {{log settings}}
+    {{#each advSettings as |setting|}}
     {{log setting}}
+    {{#with (lookup ../settings [setting])~}}
     <div class="form-group">
         <label>{{name}}</label>
         <div class="form-fields">
