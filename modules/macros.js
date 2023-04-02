@@ -55,8 +55,10 @@ export async function createAgeMacro(item, slot) {
       flags: { "age-system.itemMacro": true }
     });
   }
-  if (game.user.getHotbarMacros()[slot-1].macro) {
-    const oldMacroId = game.user.getHotbarMacros()[slot-1].macro._id;
+  let page = Math.floor(slot / 10)
+  let index = (slot % 10) - 1
+  if (game.user.getHotbarMacros(page)[index].macro) {
+    const oldMacroId = game.user.getHotbarMacros(page)[index].macro._id;
     game.macros.remove(oldMacroId);
   }
   game.user.assignHotbarMacro(macro, slot);

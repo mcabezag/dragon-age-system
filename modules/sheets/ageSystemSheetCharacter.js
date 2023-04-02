@@ -145,13 +145,13 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         ].concat(buttons);
 
         return buttons;
-    }
+    } 
 
     async _onToggleSheet(event) {
         event.preventDefault()
-        let newSheet = 'age-system.ageSystemSheetCharStatBlock'
+        let newSheet = 'dragon-age-system.ageSystemSheetCharStatBlock'
         const original = this.actor.getFlag('core', 'sheetClass') || Object.values(CONFIG.Actor.sheetClasses['char']).filter(s => s.default)[0].id
-        if (original != 'age-system.ageSystemSheetCharAlt') newSheet = 'age-system.ageSystemSheetCharAlt'
+        if (original != 'age-system.ageSystemSheetCharAlt') newSheet = 'dragon-age-system.ageSystemSheetCharAlt'
         this.actor.openSheet(newSheet)
     }
     
