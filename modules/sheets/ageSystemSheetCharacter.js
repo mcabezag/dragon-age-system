@@ -1,7 +1,6 @@
 import * as Dice from "../dice.js";
 import {ageSystem} from "../config.js";
 import { sortObjArrayByName } from "../setup.js";
-// import {isDropedItemValid} from "./helper.js";
 import {newItemData} from "./helper.js";
 
 export default class ageSystemSheetCharacter extends ActorSheet {
@@ -43,6 +42,7 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         // Order itens into alphabetic order
         const itemSorted = sortObjArrayByName(data.items, "name");
 
+        data.class = itemSorted.filter(i => i.type === "class");
         data.weapon = itemSorted.filter(i => i.type === "weapon");
         data.talent = itemSorted.filter(i => i.type === "talent");
         data.power = itemSorted.filter(i => i.type === "power");
@@ -68,36 +68,42 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         data.conditions = foundry.utils.deepClone(CONFIG.statusEffects).filter(e => e.flags?.["age-system"]?.isCondition);
         for (let i = 0; i < data.conditions.length; i++) {
             if (ageSystem.inUseStatusEffects !== 'custom') {
-                data.conditions[i].label = game.i18n.localize(data.conditions[i].label);
+                data.conditions[i].name = game.i18n.localize(data.conditions[i].name);
                 if (data.conditions[i].flags?.["age-system"]?.desc) data.conditions[i].flags["age-system"].desc = game.i18n.localize(data.conditions[i].flags["age-system"].desc);
             }
             const cond = data.conditions[i];
             const hasCondition = data.effects.filter(c => c?.flags?.core?.statusId === cond.id);
             if (hasCondition.length > 0) data.conditions[i].active = true;
         }
-        data.conditions = sortObjArrayByName(data.conditions, "label");
+        data.conditions = sortObjArrayByName(data.conditions, "name");
 
         // Filtering non condition Active Effects
-        data.effects = data.effects.filter(e => {
-            let isListed = false;
-            const isStatusEffect = e.flags?.core?.statusId ? true : false;
-            const isCondition = e.flags?.["age-system"]?.isCondition;
-            const isCurrent = ageSystem.inUseStatusEffects === e.flags?.["age-system"]?.conditionType ? true : false;
+        const statusIds = CONFIG.statusEffects.reduce((arr, e) => {
+            if (e.id) arr.push(e.id)
+            return arr
+        }, []);
+
+        data.effects = data.effects.filter(e => !statusIds.includes(e.statuses[0])) // TO DO - confirm if this Active Effect will always have a Array with 1 element.
+        // data.effects = data.effects.filter(e => {
+        //     let isListed = false;
+        //     const isStatusEffect = e.id ? false : true;
+        //     const isCondition = e.flags?.["age-system"]?.isCondition;
+        //     const isCurrent = ageSystem.inUseStatusEffects === e.flags?.["age-system"]?.conditionType ? true : false;
             
-            if (isStatusEffect) {
-                if (isCurrent) {
-                    isListed = !isCondition;
-                } else {
-                    isListed = true;
-                }
-            } else {
-                isListed = true;
-            };
+        //     if (isStatusEffect) {
+        //         if (isCurrent) {
+        //             isListed = !isCondition;
+        //         } else {
+        //             isListed = true;
+        //         }
+        //     } else {
+        //         isListed = true;
+        //     };
 
-            return isListed;
-        });
+        //     return isListed;
+        // });
 
-        data.effects = sortObjArrayByName(data.effects, `label`);       
+        data.effects = sortObjArrayByName(data.effects, `name`);       
     
         // Retrieve Prefession/Ancestry settings
         data.ancestry = game.settings.get("age-system", "ancestryOpt");
@@ -173,15 +179,13 @@ export default class ageSystemSheetCharacter extends ActorSheet {
             html.find(".effect-edit").click(this._onChangeEffect.bind(this));
             html.find(".effect-remove").click(this._onRemoveEffect.bind(this));   
             html.find("p.effect-add").click(this._onAddEffect.bind(this));
-            html.find(".change-qtd").click(this._onChangeQuantity.bind(this));
+            html.find("a.change-qtd").click(this._onChangeQuantity.bind(this));
             html.find(".degree .change-injury").click(this._onChangeInjury.bind(this));
             html.find(".mark .change-injury").click(this._onChangeMark.bind(this));
             html.find(".refresh-injury-marks").click(this._onRefreshMarks.bind(this));
             html.find(".heal-all-injuries").click(this._onFullHeal.bind(this));
             html.find(".roll-breather").click(this._onRollBreather.bind(this));
-            /**
-             * Code to be used to make the adjustment on Health/Defense/Toughness for different Game Modes
-             */
+            // Listeners to be used to make the adjustment on Health/Defense/Toughness for different Game Modes
             html.find(".game-mode-details").change(this._onAdjustHealth.bind(this));
             html.find(".game-mode .override").click(this._onLockGameMode.bind(this));
 
@@ -226,7 +230,7 @@ export default class ageSystemSheetCharacter extends ActorSheet {
             html.find(".guardup-maneuver").change(this._onGuardUpSelect.bind(this));
             html.find(".conditions .item-name").click(this._onChangeCondition.bind(this));
             html.find(".mod-active.icon").click(this._onToggleItemMod.bind(this));
-            html.find(".wgroup-item").click(this._onWeaponGroupToggle.bind(this));
+            html.find(".trait-item").click(this._onTraitGroupToggle.bind(this));
         }
        
         super.activateListeners(html);
@@ -329,28 +333,34 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         } 
     };
 
-    async _onWeaponGroupToggle(event) {
-        const actorData = this.actor.system;
+    _onTraitGroupToggle(event) {
         event.preventDefault();
-        const wgroupId = event.currentTarget.closest(".feature-controls").dataset.wgroupId.trim();
-        const wgroups = await actorData.wgroups;
-        const hasGroup = wgroups.includes(wgroupId);
+        const doc = this.actor;
+        const docData = doc.system;
+        const dataset = event.currentTarget.closest(".feature-controls").dataset
+        const traitId = dataset.traitId.trim();
+        const traitType = dataset.traitType;
+        const tGroups = docData[traitType];
+        const hasGroup = tGroups.includes(traitId);
         if (hasGroup) {
-            const pos = wgroups.indexOf(wgroupId);
-            wgroups.splice(pos, 1);
+            const pos = tGroups.indexOf(traitId);
+            tGroups.splice(pos, 1);
         } else {
-            wgroups.push(wgroupId);
+            tGroups.push(traitId);
         }
-        return this.actor.update({"system.wgroups": wgroups});
+        const path = `system.${traitType}`;
+        return doc.update({[path]: tGroups});
     }
 
     _onChangeQuantity(event) {
         event.preventDefault();
         const e = event.currentTarget;
+        const action = e.dataset.action;
         const classList = e.classList;
         const itemId = e.closest(".feature-controls").dataset.itemId;
         const item = this.actor.items.get(itemId);
-        const itemType = item.type
+        const itemType = item.type;
+        if (itemType === "class") return item._levelChange(action);
         let qtd;
         let updatePath;
         switch (itemType) {
@@ -363,12 +373,24 @@ export default class ageSystemSheetCharacter extends ActorSheet {
                 updatePath = 'system.quantity';
                 break;
         }
-        if (classList.contains("add")) return item.update({[updatePath]: qtd+1});
-        if (classList.contains("remove") && qtd > 0) return item.update({[updatePath]: qtd-1});
+
+        let newQtd
+        switch (action) {
+            case "add":
+                newQtd = qtd + 1;
+                break;
+            case "remove":
+                if (qtd == 0) return null;
+                newQtd = qtd - 1;
+                break;
+            default:
+                return null;
+        };
+
+        return item.update({[updatePath]: newQtd});
     }
 
     _onToggleItemMod(event) {
-        const actorData = this.actor.system;
         const data = event.currentTarget.dataset;
         const itemId = data.itemId;
         const key = data.key;
@@ -402,7 +424,7 @@ export default class ageSystemSheetCharacter extends ActorSheet {
 
     async _onAddEffect(event) {
         const newEffect = {
-            label: game.i18n.localize("age-system.item.newItem"),
+            name: game.i18n.localize("age-system.item.newItem"),
             origin: this.actor.uuid,
             icon: `icons/svg/aura.svg`,
             disabled: true,

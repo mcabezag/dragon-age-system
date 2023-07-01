@@ -1,4 +1,19 @@
 {
+  "TYPES.Actor.char": "Personaje",
+  "TYPES.Actor.vehicle": "Vehículo",
+  "TYPES.Actor.spaceship": "Nave",
+  "TYPES.Actor.organization": "Organización",
+  "TYPES.Item.stunts": "Proeza",
+  "TYPES.Item.equipment": "Equipo",
+  "TYPES.Item.power": "Poderes y Conjuros",
+  "TYPES.Item.talent": "Talento",
+  "TYPES.Item.focus": "Concentración",
+  "TYPES.Item.weapon": "Arma",
+  "TYPES.Item.relationship": "Vínculo",
+  "TYPES.Item.honorifics": "Títulos",
+  "TYPES.Item.membership": "Afiliación",
+  "TYPES.Item.shipfeatures": "Característica Nave",
+  "TYPES.Item.class": "Clase",
   "ACTOR.TypeChar": "Personaje",
   "ACTOR.TypeVehicle": "Vehículo",
   "ACTOR.TypeSpaceship": "Nave",
@@ -13,6 +28,7 @@
   "ITEM.TypeHonorifics": "Títulos",
   "ITEM.TypeMembership": "Afiliaciones",
   "ITEM.TypeShipfeatures": "Características Nave",
+  "ITEM.TypeClass": "Clase",
   "SETTINGS.useTargeted": "Utilizar el Objetivo para aplicar daño y curación.",
   "SETTINGS.useTargetedHint": "En vez de utilizar las tarjetas del chat y los comandos para aplicar daño y curación en los Tokens controlados, aplicarlo mediante los Tokens en el Objetivo",
   "SETTINGS.quicksetting": "Configuración rápida AGE",
@@ -39,6 +55,12 @@
   "SETTINGS.useToughnessHint": "Comprobar si el estilo de juego utiliza la Dureza como atributo",
   "SETTINGS.useBallisticArmor": "Usar Impacto y Balas en armadura",
   "SETTINGS.useBallisticArmorHint": "Seleccionar si las armaduras se dividen con Impacto y Balas",
+  "SETTINGS.DegressChoice": "Rangos de Talento",
+  "SETTINGS.DegressChoiceHint": "Cantidad y nombre de los rangos de talento",
+  "SETTINGS.TalentDegreesMAGE": "Aprendiz, Experto, Maestro",
+  "SETTINGS.TalentDegreesFAGE": "Aprendiz, Experto, Maestro",
+  "SETTINGS.TalentDegreesMAGEExtra": "Aprendiz, Experto, Maestro, Gran Maestro, Cima",
+  "SETTINGS.TalentDegreesFAGEExtra": "Aprendiz, Experto, Maestro, Gran Maestro, Cima",
   "SETTINGS.wealthType": "Sistema de riqueza",
   "SETTINGS.wealthTypeHint": "Recursos y Renta son sistemas de riqueza basado en tiradas, mientras Dinero/Moneda es el sistema típico de compras",
   "SETTINGS.wealthTypeResources": "Recursos",
@@ -105,6 +127,11 @@
   "SETTINGS.healthSysmage": "Modern AGE",
   "SETTINGS.healthSysmageInjury": "Modern AGE (alternate: Heridas)",
   "SETTINGS.healthSysmageVitality": "Modern AGE (alternate: Heridas & Vitalidad)",
+  "SETTINGS.powerFlavor": "Tipo de Poder",
+  "SETTINGS.powerFlavorHint": "Selecciona el tipo de Poder asignado a los nombres de los poderes y sus puntos, dependiendo del manual AGE.",
+  "SETTINGS.powerFlavorPower": "Poderes y Puntos",
+  "SETTINGS.powerFlavorMana": "Conjuros y Puntos Mana",
+  "SETTINGS.powerFlavorSpell": "Conjuros y Puntos",
   "age-system": {
     "SHEETS": {
       "charStandard": "Personaje AGE",
@@ -136,7 +163,11 @@
       "vehicleItem": "Los Vehículos no pueden recibir Objetos",
       "breatherAppliedAll": "Descanso aplicado a todos los PJs seleccionados",
       "newFocusCompendia": "Configuración Sistema AGE (Compendio Concentración): Los siguientes compendios no se mostrarán como opciones para Concentración hasta que se actualicen: {list}.",
-      "oldFocusCompendia": "Configuración Sistema AGE (Compendio Concentración): Los siguientes compendios no existen y se eliminarán de la lista después de actualizar: {list}."
+      "oldFocusCompendia": "Configuración Sistema AGE (Compendio Concentración): Los siguientes compendios no existen y se eliminarán de la lista después de actualizar: {list}.",
+      "emptyAdv": "Todos los niveles del Avance Progresivo tienen un valor vacío o cero. No se guarda el Avance.",
+      "emptyItemArr": "Ningún objeto seleccionado para el progreso. No se grabará nada.",
+      "ownedClassLevelOnly": "Sólo la clase de Objeto con dueño puede ser progresado.",
+      "actorHasClass": "¡El Actor ya dispone de una Clase!"
     },
     "spaceship": {
       "op": "Operador",
@@ -423,8 +454,29 @@
     "addLevel": "Añadir Nivel",
     "autoApply": "Auto Aplicar",
     "rollWithoutPP": "{name} no dispone de suficientes puntos para usar {item}. ¿Tirar igualmente?",
-    "powerPoints": "Puntos de maná",
-    "powerPointsIndex": "pm",
+    "powerFlavor": {
+      "power": {
+        "name": "Poder",
+        "namePlural": "Poderes",
+        "points": "Puntos Poder",
+        "index": "PP",
+        "force": "Poder"
+      },
+      "mana": {
+        "name": "Conjuro",
+        "namePlural": "Conjuros",
+        "points": "Puntos Mana",
+        "index": "PM",
+        "force": "Poder"
+      },
+      "spell": {
+        "name": "Conjuro",
+        "namePlural": "Conjuros",
+        "points": "Puntos Magia",
+        "index": "PM",
+        "force": "Poder"
+      }
+    },
     "name": "Nombre",
     "features": "Rasgo Distintivo",
     "toughness": "Dureza",
@@ -540,8 +592,7 @@
       "active": "Activo",
       "charAbl": "Atributo",
       "type": "Tipo",
-      "value": "Valor",
-      "allOutAtk": "Daño Ataque Total"
+      "value": "Valor"
     },
     "stuntsContainer": "Proezas",
     "equipmentContainer": "Equipo",
@@ -663,6 +714,27 @@
     "invalidFileContent": "El contenido del archivo no es válido",
     "customEffects": "Efectos Personalizados",
     "customEffectsSet": "Efectos Personalizados activos",
-    "attkHeader": "Arma Ataque Daño"
+    "attkHeader": "Arma Ataque Daño",
+    "advancement": "Progreso",
+    "improvements": "Mejoras",
+    "advancementNew": "Selecciona Progreso",
+    "levelName": "Nivel {level}",
+    "advProgressiveTrait": "Característica Progresiva",
+    "advNewItem": "Nuevo Objeto o mejorar Uno Existente",
+    "advAbility": "Mejorar Habilidad",
+    "defenseAndToughness": "Defensa y Dureza",
+    "trait": "Característica",
+    "alias": "Alias",
+    "confirm": "Confirmar",
+    "image": "Imagen",
+    "itemProgression": "Progresión de Objeto",
+    "itemProgressionHint": "Añade a la lista de abajo, la opción de Progresar un Objeto del tipo escogido.",
+    "itemOptionSingle": "Recibir un objeto",
+    "itemOptionSingleProgress": "Recibir o Avance de uno",
+    "itemOptionMultiple": "Escoge objetos de la lista",
+    "itemOptionAll": "Recibir todos los objetos",
+    "dragAdvItem": "Arrastrar los Avances en el espacio debajo",
+    "add": "Añadir",
+    "leveledImprovements": "Mejoras Obtenidas"
   }
 }

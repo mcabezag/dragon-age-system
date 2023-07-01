@@ -25,6 +25,7 @@ import * as migrations from "./modules/migration.js";
 async function preloadHandlebarsTemplates() {
     const path = `systems/dragon-age-system/templates/partials/`;
     const templatePaths = [
+        `${path}itemcontrols/class.hbs`,
         `${path}itemcontrols/equipment.hbs`,
         `${path}itemcontrols/honorifics.hbs`,
         `${path}itemcontrols/membership.hbs`,
@@ -35,7 +36,6 @@ async function preloadHandlebarsTemplates() {
         `${path}itemcontrols/weapon.hbs`,
         `${path}ability-focus-select.hbs`,
         `${path}active-bonuses.hbs`,
-        `${path}bonus-desc-sheet.hbs`,
         `${path}bonuses-sheet.hbs`,
         `${path}char-sheet-alt-main.hbs`,
         `${path}char-sheet-alt-persona.hbs`,
@@ -46,20 +46,17 @@ async function preloadHandlebarsTemplates() {
         `${path}char-sheet-alt-powers.hbs`,
         `${path}char-sheet-alt-effects.hbs`,
         `${path}char-sheet-alt-options.hbs`,
+        `${path}char-sheet-alt-adv.hbs`,
         `${path}char-sheet-nav-bar.hbs`,
-        `${path}char-sheet-tab-main.hbs`,
         `${path}char-sheet-injury-bar.hbs`,
-        `${path}char-sheet-tab-persona.hbs`,
-        `${path}char-sheet-tab-effects.hbs`,
-        `${path}char-sheet-tab-options.hbs`,
         `${path}char-stat-block-column1.hbs`,
         `${path}conditions-block.hbs`,
         `${path}cost-resource-block.hbs`,
         `${path}dmg-block-sheet.hbs`,
         `${path}item-card-buttons.hbs`,
-        `${path}item-image-sheet-card.hbs`,
         `${path}item-options-sheet.hbs`,
         `${path}play-aid-bar.hbs`,
+        `${path}weapon-group-block.hbs`
     ];
 
     return loadTemplates(templatePaths);
@@ -102,10 +99,6 @@ Hooks.once("init", async function() {
     };
 
     Actors.unregisterSheet("core", ActorSheet);
-    // Actors.registerSheet("dragon-age-system", ageSystemSheetCharacter, {
-    //     types: ["char"],
-    //     label: "Legacy"
-    // });
     Actors.registerSheet("dragon-age-system", ageSystemSheetCharAlt, {
         types: ["char"],
         makeDefault: true,
@@ -163,6 +156,10 @@ Hooks.once("init", async function() {
 
     // Register System Settings
     await Settings.registerSystemSettings();
+    // Identify Ability set in use
+    const abilitySelection = game.settings.get("age-system", "abilitySelection");
+    const abilityOptions = ageSystem.abilitiesSettings;
+    ageSystem.abilities = abilityOptions[abilitySelection];
 
     // Register Settings
     ageSystem.stuntAttackPoints = game.settings.get("age-system", "stuntAttack");
@@ -258,7 +255,13 @@ Hooks.once("init", async function() {
     Handlebars.registerHelper('tdegree', function(value) {
         value = Number(value);
         if (isNaN(value)) return ""
-        return ageSystem.talentDegrees[value];
+        return ageSystem.talentDegrees.inUse[value];
+    });
+
+    // Handlebar so show Level 1 to 20 using a Array with 20 positions
+    Handlebars.registerHelper("levelarr", function(value, options)
+    {
+        return parseInt(value) + 1;
     });
 
     // Handlebar helper to compare 2 data
@@ -284,25 +287,12 @@ Hooks.once("init", async function() {
     ageSystem.coreVersion = game.world.coreVersion;
     ageSystem.systemVersion = game.world.systemVersion
 
-});
-
-Hooks.once("setup", function() {
-    // Config type icons
-    // CONFIG.Actor.typeIcons = ageSystem.actorIcons;
-    // CONFIG.Item.typeIcons = ageSystem.itemIcons;
-
-    const talentDegrees = foundry.utils.deepClone(ageSystem.mageDegrees);
-    for (let i = 0; i < talentDegrees.length; i++) {
-        talentDegrees[i] = game.i18n.localize(talentDegrees[i]);
-    }
-    ageSystem.talentDegrees = talentDegrees;
-    
-    // Set Health System configuration
+    // Pre-definition of Health System setting
     const hstype = game.settings.get("age-system", "healthSys");
     const HEALTH_SYS = {
         type: hstype,
         mode: game.settings.get("age-system", "gameMode"),
-        healthName: game.i18n.localize(`SETTINGS.healthMode${game.settings.get("age-system", "healthMode")}`),
+        // healthName: game.i18n.localize(`SETTINGS.healthMode${game.settings.get("age-system", "healthMode")}`),
         useToughness: ![`basic`].includes(hstype),
         useFortune: [`expanse`].includes(hstype),
         useHealth: [`basic`, `mage`].includes(hstype),
@@ -311,12 +301,34 @@ Hooks.once("setup", function() {
         useBallistic: [`mage`, `mageInjury`, `mageVitality`].includes(hstype),
         baseDamageTN: 13
     };
-    CONFIG.ageSystem.damageSource = HEALTH_SYS.useBallistic ? CONFIG.ageSystem.damageSourceOpts.useBallistic : CONFIG.ageSystem.damageSourceOpts.noBallistic;
-    CONFIG.ageSystem.healthSys = HEALTH_SYS;
-    
+    ageSystem.damageSource = HEALTH_SYS.useBallistic ? CONFIG.ageSystem.damageSourceOpts.useBallistic : CONFIG.ageSystem.damageSourceOpts.noBallistic;
+    ageSystem.healthSys = HEALTH_SYS;
+
+});
+
+Hooks.once("setup", function() {
     // Specific Localization
+    Setup.localizePower();
     Setup.abilitiesName();
     Setup.localizeAgeEffects();
+    ageSystem.healthSys.healthName = game.i18n.localize(`SETTINGS.healthMode${game.settings.get("age-system", "healthMode")}`);
+
+    // Maximum Talent Degree definition
+    const degreeChoice = foundry.utils.deepClone(game.settings.get("age-system", "DegressChoice"));
+    const inUseDegrees = ageSystem.talentDegrees[degreeChoice];
+    for (let i = 0; i < inUseDegrees.length; i++) {
+        inUseDegrees[i] = game.i18n.localize(inUseDegrees[i]);
+    }
+    ageSystem.talentDegrees.inUse = inUseDegrees;
+
+    // Useful Array containing key of Actor Abilities
+    const ablKeys = [];
+    for (const k in CONFIG.ageSystem.abilities) {
+        if (Object.hasOwnProperty.call(CONFIG.ageSystem.abilities, k)) {
+            ablKeys.push(k)
+        }
+    }
+    CONFIG.ageSystem.ABILITY_KEYS = ablKeys;
 
     // Target/Controlled option to damage/heal
     CONFIG.ageSystem.useTargeted = game.settings.get("age-system", "useTargeted");
@@ -327,7 +339,7 @@ Hooks.once("setup", function() {
 
 Hooks.once("ready", async function() {
     // Identify Colorset
-    const color = await game.user.getFlag("dragon-age-system", "colorScheme"); //todo: this is la buena 
+    const color = await game.user.getFlag("dragon-age-system", "colorScheme"); //todo: this is la buena
     if (color) await game.settings.set("age-system", "colorScheme", color);
     if (!color) game.user.setFlag("dragon-age-system", "colorScheme", game.settings.get("age-system", "colorScheme"));
     // Register color scheme on global name space
@@ -392,7 +404,6 @@ Hooks.once("ready", async function() {
             // names must be equal
             return 0;
         });
-
     }
     // Check if PDFoundry is active
     if (game.modules.get("pdfoundry")?.active) ageSystem.pdfoundryOn = true;
@@ -420,7 +431,7 @@ Hooks.once("ready", async function() {
 
 
 Hooks.on('chatMessage', (chatLog, content, userData) => AgeChat.ageCommand(chatLog, content, userData))
-Hooks.on("renderageSystemItemSheet", (app, html, data) => {Setup.nameItemSheetWindow(app)});
+// Hooks.on("renderageSystemItemSheet", (app, html, data) => {Setup.nameItemSheetWindow(app)});
 Hooks.on("renderageSystemSheetCharacter", (app, html, data) => {Setup.hidePrimaryAblCheckbox(html)});
 Hooks.on("renderChatLog", (app, html, data) => {    AgeChat.addChatListeners(html)});
 Hooks.on("renderChatMessage", (app, html, data) => {AgeChat.sortCustomAgeChatCards(app, html, data)});

@@ -1,5 +1,77 @@
 # Release Notes
 
+## 2.0.2 [2023-06-xx]
+### Fixed
+- Added a 36px offset on AGE Roller icon to avoid overlapping new macro bar buttons.
+- Bug causing Spaceship Actor image on sheet to overflow and make it impossible to interact with some sheet elements.
+
+## 2.0.1 [2023-06-18]
+### Fixed
+- Talent degree shows up correctly on character sheet Talent tab.
+- Removed typos on Document types' localization.
+
+## 2.0.0 [2023-06-04]
+### Added
+- FoundryVTT v10 and v11 compatible.
+- System Setting added to select Flavor for Powers and Power Points.
+- Added option to select Talent degrees as normal or expanded (as seem on Modern AGE Companion). Inclusion by [Txus](https://github.com/Txus5012). Thanks!
+
+## 1.2.4 [2023-04-07]
+### Fixed
+- Header text on character/item sheet is now back with center alignment.
+- Bug preventing changing Primary Ability and Weapon Group on Class sheet.
+
+## 1.2.3 [2023-04-04]
+### Fixed
+- Sheets behave correctly when changing font size from Core Settings.
+- When opening Damage Dialog with right-clicking damage button while pressing CTRL or CTRL + ALT will now populate "Extra Damage" field accordingly.
+- "Coins" box on character sheet now have consistent style compared to other boxes on character sheet.
+
+## 1.2.2 [2023-04-03]
+### Changed
+- Better contrast control for input fields.
+
+## 1.2.1 [2023-04-03]
+### Changed
+- TinyMCE editor removed in benefit of ProseMirror on Actors and Item sheets.
+
+### Fixed
+- Issue preventing adding or removing weapon groups from Weapons.
+
+## 1.2.0 [2023-04-02]
+### Added
+- New "Class" Item type to track character leveling. Currently, only creating the Item is possible. In the next release it will be possible to pass to a Character and use it to level up.
+
+### Changed
+- Text boxes from Character and Item sheets follow the same style and respond to window resizing.
+- Changed icon of AGE Roller (the icon close to Macro Bar).
+
+### Fixed
+- Tests and damage rolled by an unlinked token will correctly display token name on chat card and not the name on character sheet.
+
+## 1.1.12 [2023-01-27]
+### Fixed
+- Defense calculation corrected.
+
+## 1.1.11 [2023-01-26]
+### Fixed
+- Corrected order to apply Active Effects.
+
+## 1.1.10 [2023-01-22]
+### Fixed
+- Active Effects applied to final calculations (final Defense, final Test mods, etc) were not working correctly.
+
+## 1.1.9 [2023-01-20]
+### Fixed
+- Some chat cards created in old versions rendering incorrectly.
+- Problem selecting Game Mode when using Quick Settings.
+- Token sheet will update color settings without needing to closing it and openning again.
+- Data calculated based on Abilities has now the correct values when implementing Conditons or Active Effects.
+- Healing a character will now heal up to maximum Health/Fortune plus mods.
+- Shift + Left Click will now correctly trigger blind roll to GM.
+- Fixed calculation when using qualities/flaws on Spaceship which modify Hull and Sensors.
+- Fixed bug causing The Expanse quick setting to set properly Churn functionality.
+
 ## 1.1.8 [2022-10-06]
 ### Fixed
 - Description now appears correctly on Organization sheet when not on text editor mode.

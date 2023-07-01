@@ -3,7 +3,7 @@
     "name": "dragon-age-system",
     "title": "Dragon AGE System (fork)",
     "description": "Unofficial Dragon Age implementation",
-    "version": "1.0.15",
+    "version": "2.0.0",
     "authors": [
 		{
 			"name": "VK Dolea",
@@ -25,6 +25,11 @@
           "type": "cover",
           "url": "https://imgur.com/5k8i0Fy.png",
           "caption": "AGE System (unofficial)"
+        },
+        {
+        "type": "setup",
+        "url": "systems/dragon-age-system/resources/logo/age-logo.png",
+        "thumbnail": "systems/dragon-age-system/resources/logo/age-logo.png"
         }
     ],
     "scripts": [],
@@ -59,11 +64,11 @@
     "initiative": "3d6 + @initiative",
     "compatibility": {
         "minimum": "10.278",
-        "verified": 10,
-        "maximum": 10
+        "verified": "11.302",
+        "maximum": 11
     },
     "minimumCoreVersion": "10.278",
-    "compatibleCoreVersion": "10.286",
+    "compatibleCoreVersion": "11.302",
     "url": "https://github.com/mcabezag/dragon-age-system",
     "manifest": "https://raw.githubusercontent.com/mcabezag/dragon-age-system/workspace/system.json",
     "download": "https://github.com/mcabezag/dragon-age-system/archive/v1.0.15.zip",
