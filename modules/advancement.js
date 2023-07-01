@@ -15,7 +15,7 @@ export class AdvancementAdd extends Application {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
       classes: ['age-system-dialog', 'age-system', 'advancement-config'],
-      template: 'systems/age-system/templates/advancement-add.hbs',
+      template: 'systems/dragon-age-system/templates/advancement-add.hbs',
       resizable: false,
       minimizable: false,
       width: 400,
@@ -137,7 +137,7 @@ export class AdvancementSetup extends FormApplication {
     return mergeObject(super.defaultOptions, {
       dragDrop: [{ dropSelector: ".item-drop-area" }],
       classes: ['age-system-dialog', 'age-system', 'advancement-config'],
-      template: 'systems/age-system/templates/advancement-setup.hbs',
+      template: 'systems/dragon-age-system/templates/advancement-setup.hbs',
       resizable: false,
       minimizable: false,
       width: 420,
