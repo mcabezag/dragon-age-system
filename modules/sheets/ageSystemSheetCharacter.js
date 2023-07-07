@@ -78,30 +78,24 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         data.conditions = sortObjArrayByName(data.conditions, "label");
 
         // Filtering non condition Active Effects
-        const statusIds = CONFIG.statusEffects.reduce((arr, e) => {
-            if (e.id) arr.push(e.id)
-            return arr
-        }, []);
-
-        data.effects = data.effects.filter(e => !statusIds.includes(e.statuses[0])) // TO DO - confirm if this Active Effect will always have a Array with 1 element.
-        // data.effects = data.effects.filter(e => {
-        //     let isListed = false;
-        //     const isStatusEffect = e.id ? false : true;
-        //     const isCondition = e.flags?.["age-system"]?.isCondition;
-        //     const isCurrent = ageSystem.inUseStatusEffects === e.flags?.["age-system"]?.conditionType ? true : false;
+        data.effects = data.effects.filter(e => {
+            let isListed = false;
+            const isStatusEffect = e.flags?.core?.statusId ? true : false;
+            const isCondition = e.flags?.["age-system"]?.isCondition;
+            const isCurrent = ageSystem.inUseStatusEffects === e.flags?.["age-system"]?.conditionType ? true : false;
             
-        //     if (isStatusEffect) {
-        //         if (isCurrent) {
-        //             isListed = !isCondition;
-        //         } else {
-        //             isListed = true;
-        //         }
-        //     } else {
-        //         isListed = true;
-        //     };
+            if (isStatusEffect) {
+                if (isCurrent) {
+                    isListed = !isCondition;
+                } else {
+                    isListed = true;
+                }
+            } else {
+                isListed = true;
+            };
 
-        //     return isListed;
-        // });
+            return isListed;
+        });
 
         data.effects = sortObjArrayByName(data.effects, `label`);
     
@@ -157,7 +151,7 @@ export default class ageSystemSheetCharacter extends ActorSheet {
         event.preventDefault()
         let newSheet = 'dragon-age-system.ageSystemSheetCharStatBlock'
         const original = this.actor.getFlag('core', 'sheetClass') || Object.values(CONFIG.Actor.sheetClasses['char']).filter(s => s.default)[0].id
-        if (original != 'age-system.ageSystemSheetCharAlt') newSheet = 'dragon-age-system.ageSystemSheetCharAlt'
+        if (original != 'dragon-age-system.ageSystemSheetCharAlt') newSheet = 'dragon-age-system.ageSystemSheetCharAlt'
         this.actor.openSheet(newSheet)
     }
     
@@ -424,7 +418,6 @@ export default class ageSystemSheetCharacter extends ActorSheet {
 
     async _onAddEffect(event) {
         const newEffect = {
-            name: game.i18n.localize("age-system.item.newItem"),
             label: game.i18n.localize("age-system.item.newItem"),
             origin: this.actor.uuid,
             icon: `icons/svg/aura.svg`,

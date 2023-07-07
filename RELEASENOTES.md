@@ -1,11 +1,6 @@
 # Release Notes
 
-## 2.0.2 [2023-06-xx]
-### Fixed
-- Added a 36px offset on AGE Roller icon to avoid overlapping new macro bar buttons.
-- Bug causing Spaceship Actor image on sheet to overflow and make it impossible to interact with some sheet elements.
-
-## 2.0.1 [2023-06-18]
+## 2.0.1 [2023-06-04]
 ### Fixed
 - Talent degree shows up correctly on character sheet Talent tab.
 - Removed typos on Document types' localization.
